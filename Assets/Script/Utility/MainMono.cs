@@ -6,7 +6,7 @@ public class MainMono : MonoBehaviour
     public static MainMono Instance;
     public Action OnUpdate;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance == null)
             Instance = this;
@@ -14,7 +14,7 @@ public class MainMono : MonoBehaviour
             Destroy(this);
     }
 
-    void Update()
+    private void Update()
     {
         OnUpdate?.Invoke();
     }

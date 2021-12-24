@@ -2,7 +2,6 @@
 
 public class BulletPool
 {
-    private static BulletPool instance;
     public static BulletPool Instance
     {
         private set { }
@@ -13,7 +12,7 @@ public class BulletPool
             return instance;
         }
     }
-
+    private static BulletPool instance;
     private List<Bullet> bullets;
     private int currentIdx = 0;
 
@@ -31,8 +30,9 @@ public class BulletPool
 
     public void RemoveBullet(Bullet bullet)
     {
-        if (bullets != null && bullets.Contains(bullet))
-            bullets.Remove(bullet);
+        if (bullets != null)
+            if (bullets.Contains(bullet))
+                bullets.Remove(bullet);
     }
 
     public Bullet GetCurrentIdleBullet()
@@ -44,12 +44,14 @@ public class BulletPool
 
         if (output.IsShooting)
             return null;
+        else
+        {
+            currentIdx += 1;
 
-        currentIdx += 1;
+            if (currentIdx >= bullets.Count)
+                currentIdx = 0;
 
-        if (currentIdx >= bullets.Count)
-            currentIdx = 0;
-
-        return output;
+            return output;
+        }
     }
 }

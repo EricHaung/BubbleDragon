@@ -3,14 +3,15 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public Action<Bullet> OnShooting;
     public Action<Bullet> OnShootingEnd;
     public bool IsShooting
     {
         private set { }
         get { return isShooting; }
     }
+    private int bulletType = -1;
     private bool isShooting = false;
-    private float resetTimer = 0;
     private BounceMovement bounceMovement;
 
     private void Start()
@@ -22,16 +23,7 @@ public class Bullet : MonoBehaviour
     private void Update()
     {
         if (isShooting)
-        {
-            resetTimer += Time.deltaTime;
-            if (resetTimer >= 1)
-            {
-                resetTimer = 0;
-                isShooting = false;
-                OnShootingEnd?.Invoke(this);
-                Reset();
-            }
-        }
+            OnShooting?.Invoke(this);
     }
 
     private void OnDestroy()
@@ -45,8 +37,27 @@ public class Bullet : MonoBehaviour
         bounceMovement.SetDir(speed, dir);
     }
 
+    public void SetBulletType(int _bulletType)
+    {
+        bulletType = _bulletType;
+        this.GetComponent<UnityEngine.UI.Image>().sprite = BubbleGameManager.Instance.bubbleSprites[bulletType];//view
+    }
+
+    public int GetBulletType()
+    {
+        return bulletType;
+    }
+
+    public Vector3 GetDir()
+    {
+        return bounceMovement.GetDir();
+    }
+
     public void Reset()
     {
+        isShooting = false;
+        bulletType = -1;
         bounceMovement.Reset();
+        OnShootingEnd?.Invoke(this);
     }
 }

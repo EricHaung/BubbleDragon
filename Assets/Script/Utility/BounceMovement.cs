@@ -21,6 +21,9 @@ public class BounceMovement : MonoBehaviour
 
     private void Update()
     {
+        if (dir == Vector3.zero)
+            return;
+
         moveItem.localPosition += dir;
 
         hitBorderType = IsHitXBorder();
@@ -42,6 +45,11 @@ public class BounceMovement : MonoBehaviour
     {
         dir.x = speed * Mathf.Cos(angle);
         dir.y = speed * Mathf.Sin(angle);
+    }
+
+    public Vector3 GetDir()
+    {
+        return dir;
     }
 
     public void Reset()

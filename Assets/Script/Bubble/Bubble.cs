@@ -7,7 +7,7 @@ public class Bubble : MonoBehaviour
     private bool isRoot = false; //黏在底座的球
     private int type = -1;
     private Vector3 position;
-    private List<Bubble> neighbourBubbles;
+    public List<Bubble> neighbourBubbles;
 
     private Gravity gravity;
 

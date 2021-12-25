@@ -10,9 +10,10 @@ public class BubbleGameManager : MonoBehaviour
 
     [HeaderAttribute("Bubble Property")]
     public List<Sprite> bubbleSprites;
-    public Transform bubbleRoot;
+    public Transform bubbleParent;
     public RectTransform spawnRange;
     private BubbleFactory bubbleFactory;
+    private BubbleRoot bubbleRoot;
     private ShooterMediator shooterMediator;
     private Piner piner;
     private Bullet currentBullet;
@@ -30,7 +31,7 @@ public class BubbleGameManager : MonoBehaviour
 
     private void Start()
     {
-        InitLevel(0.5f);
+        InitLevel(0.1f);
     }
 
     private void OnDestroy()
@@ -41,15 +42,29 @@ public class BubbleGameManager : MonoBehaviour
 
     public void InitLevel(float difficulty)
     {
-        bubbleFactory = new BubbleFactory(difficulty, bubbleSprites, bubbleRoot, spawnRange);
+        bubbleFactory = new BubbleFactory(difficulty, bubbleSprites, bubbleParent, spawnRange);
         bubbleFactory.CreateBubbles();
         BubbleManager.Instance.OnBubbleHit += OnBubbleHit;
+    }
+
+    public void AssignBubbleRoot(BubbleRoot _bubbleRoot)
+    {
+        bubbleRoot = _bubbleRoot;
+        bubbleRoot.OnRootHit += OnRootHit;
+    }
+
+    public void OnRootHit(GameObject hitObj)
+    {
+        Bullet bullet = hitObj.GetComponent<Bullet>();
+        Bubble newBubble = bubbleFactory.CreateBubble(new Vector3(hitObj.transform.position.x, bubbleParent.position.y - BubbleFactory.BUBBLE_DISTANCE / 2f, 0), true, true, bullet.GetBulletType());
+        // 需要更好的位置計算法
+        bullet.Reset();
     }
 
     public void OnBubbleHit(Bubble hitBubble, GameObject hitObj)
     {
         Bullet bullet = hitObj.GetComponent<Bullet>();
-        Bubble newBubble = bubbleFactory.CreateBubble(PositionFix(hitBubble, bullet), true, false, bullet.GetBulletType());
+        Bubble newBubble = bubbleFactory.CreateBubble(PositionFix(hitBubble.transform.position, bullet), true, false, bullet.GetBulletType());
         // 需要更好的位置計算法
         bullet.Reset();
 
@@ -61,9 +76,9 @@ public class BubbleGameManager : MonoBehaviour
             }
     }
 
-    private Vector3 PositionFix(Bubble bubble, Bullet bullet)
+    private Vector3 PositionFix(Vector3 hitPosition, Bullet bullet)
     {
-        float offset = BubbleFactory.BUBBLE_DISTANCE - Vector3.Distance(bubble.transform.position, bullet.transform.position);
+        float offset = BubbleFactory.BUBBLE_DISTANCE - Vector3.Distance(hitPosition, bullet.transform.position);
         Vector3 originPos = bullet.transform.position;
         Vector3 direction = bullet.GetDir();
         float ratio = Mathf.Sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -101,6 +116,7 @@ public class BubbleGameManager : MonoBehaviour
     public void OnShooting(Bullet bullet)
     {
         BubbleManager.Instance.TryHit(bullet.gameObject);
+        bubbleRoot?.TryHit(bullet.gameObject);
     }
 
     private void BulletReset(Bullet bullet)
@@ -112,7 +128,7 @@ public class BubbleGameManager : MonoBehaviour
         if (shootTime >= BUBBLE_FALL_DOWN_COUNT)
         {
             BubbleManager.Instance.DropDownBubbles();
-            bubbleFactory.bubbleRoot.transform.localPosition += Vector3.down * BubbleFactory.BUBBLE_DISTANCE / 2f;
+            bubbleFactory.bubbleParent.transform.localPosition += Vector3.down * BubbleFactory.BUBBLE_DISTANCE / 2f;
             shootTime = 0;
         }
     }

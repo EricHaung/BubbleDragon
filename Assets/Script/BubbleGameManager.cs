@@ -31,7 +31,7 @@ public class BubbleGameManager : MonoBehaviour
 
     private void Start()
     {
-        InitLevel(0.1f);
+        InitLevel(0.5f);
     }
 
     private void OnDestroy()

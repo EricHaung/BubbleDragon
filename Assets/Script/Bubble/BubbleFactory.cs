@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class BubbleFactory
 {
     public List<Sprite> bubbleSprites;
-    public Transform bubbleRoot;
+    public Transform bubbleParent;
     public RectTransform spawnRange;
 
     public static readonly float BUBBLE_DISTANCE = 48; //因為素材圖片可能不是滿版，所以生出來的圖片可能看起來會有間距，調整這個參數可以讓泡泡的碰撞判定距離變近，生成的泡泡也可以靠得比較近
@@ -15,11 +15,11 @@ public class BubbleFactory
     private Vector2 initialPosition;
     private int line;
 
-    public BubbleFactory(float _difficulty, List<Sprite> _bubbleSprites, Transform _bubbleRoot, RectTransform _spawnRange)
+    public BubbleFactory(float _difficulty, List<Sprite> _bubbleSprites, Transform _bubbleParent, RectTransform _spawnRange)
     {
         difficulty = _difficulty;
         bubbleSprites = _bubbleSprites;
-        bubbleRoot = _bubbleRoot;
+        bubbleParent = _bubbleParent;
         spawnRange = _spawnRange;
     }
     public void CreateBubbles()
@@ -45,7 +45,7 @@ public class BubbleFactory
         GameObject bubbleObj = new GameObject("Bubble");
         bubbleObj.AddComponent<Image>().sprite = bubbleSprites[type];
         RectTransform bubbleTransform = bubbleObj.GetComponent<RectTransform>();
-        bubbleTransform.SetParent(bubbleRoot);
+        bubbleTransform.SetParent(bubbleParent);
         bubbleTransform.SetSiblingIndex(0);
         if (isWorldSpace)
             bubbleTransform.position = position;

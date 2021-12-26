@@ -57,6 +57,11 @@ public class Gravity : MonoBehaviour
     public void SetGravityActive(bool _active)
     {
         active = _active;
-        speed = acceleration * UnityEngine.Random.Range(0f, 0.5f);
+        if (active)
+            speed = acceleration * UnityEngine.Random.Range(0f, 0.5f);
+        else
+        {
+
+        }
     }
 }

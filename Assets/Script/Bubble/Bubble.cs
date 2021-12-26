@@ -5,26 +5,36 @@ using UnityEngine;
 public class Bubble : MonoBehaviour
 {
     private bool isRoot = false; //黏在底座的球
+    private bool isIdle = false; //空閒中沒有被使用到
     private int type = -1;
-    private Vector3 position;
-    public List<Bubble> neighbourBubbles;
-
+    private bool isRainball;
+    private List<Bubble> neighbourBubbles;
     private Gravity gravity;
 
-    public void SetUp(bool _isRoot, int _type, Vector3 _position)
+    public void SetUp(bool _isRoot, int _type)
     {
         neighbourBubbles = new List<Bubble>();
         gravity = this.gameObject.AddComponent<Gravity>();
         gravity.SetUp(new Vector4(0, 0, 456, -730), new Vector3(0, -9.8f * 100f, 0), Vector3.zero);
+        isIdle = false;
         isRoot = _isRoot;
         type = _type;
-        position = _position;
         CollectNeighbour();
     }
 
-    public Vector3 GetPostion()
+    public int GetBubbleType()
     {
-        return position;
+        return type;
+    }
+
+    public void SetBubbleIdle(bool _isIdle)
+    {
+        isIdle = _isIdle;
+    }
+
+    public bool GetBubbleIdle()
+    {
+        return isIdle;
     }
 
     public List<Bubble> GetAllSameTypeNeighbour(bool isFirstBubble, List<Bubble> bubbleInclude)
@@ -47,26 +57,14 @@ public class Bubble : MonoBehaviour
 
     public void TryHit(GameObject hitObj)
     {
-        if (Vector3.Distance(this.transform.position, hitObj.transform.position) < BubbleFactory.BUBBLE_DISTANCE)
+        if (Vector3.Distance(this.transform.position, hitObj.transform.position) < BubbleFactory.BUBBLE_DISTANCE && !isIdle)
             BubbleManager.Instance.BubbleHit(this, hitObj);
     }
 
     public void OnEliminate()
     {
-        UpdatePostion(new Vector3(330, 250, 0));
-        RemoveNeighbour();
-    }
-
-    private void OnFallOutside()
-    {
-        gravity.OnBorderHit -= OnFallOutside;
-        UpdatePostion(new Vector3(330, 250, 0));
-    }
-
-    private void OnFallDown()
-    {
-        gravity.SetGravityActive(true);
-        gravity.OnBorderHit += OnFallOutside;
+        UpdatePostion(new Vector3(630, -600, 0));
+        BubbleManager.Instance.SetBubbleIdle(this);
         RemoveNeighbour();
     }
 
@@ -77,7 +75,7 @@ public class Bubble : MonoBehaviour
             if (bubble == this)
                 continue;
 
-            if (Vector3.Distance(position, bubble.GetPostion()) <= BubbleFactory.BUBBLE_DISTANCE * 1.01f)
+            if (Vector3.Distance(this.transform.localPosition, bubble.transform.localPosition) <= BubbleFactory.BUBBLE_DISTANCE * 1.01f)
             {
                 neighbourBubbles.Add(bubble);
                 bubble.NotifyNeighbourCollect(this);
@@ -91,10 +89,12 @@ public class Bubble : MonoBehaviour
             neighbourBubbles.Add(bubble);
     }
 
-    private void UpdatePostion(Vector3 _position)
+    public void UpdatePostion(Vector3 position, bool isWorldSpace = false)
     {
-        position = _position;
-        this.gameObject.transform.localPosition = position;
+        if (isWorldSpace)
+            this.gameObject.transform.position = position;
+        else
+            this.gameObject.transform.localPosition = position;
     }
 
     private void RemoveNeighbour()
@@ -107,6 +107,14 @@ public class Bubble : MonoBehaviour
         neighbourBubbles = new List<Bubble>();
     }
 
+    private void NotifyNeighbourRemove(Bubble bubble)
+    {
+        if (neighbourBubbles.Contains(bubble))
+        {
+            neighbourBubbles.Remove(bubble);
+        }
+    }
+
     private void CheckHasRoot()
     {
         if (neighbourBubbles.Count > 0)
@@ -115,7 +123,7 @@ public class Bubble : MonoBehaviour
                 List<Bubble> leftBubble = new List<Bubble>();
                 if (!testBubble.IsRootExist(leftBubble))
                 {
-                    leftBubble.ForEach(item => item.OnFallDown());
+                    leftBubble.ForEach(item => item.FallDown());
                 }
             }
     }
@@ -140,12 +148,18 @@ public class Bubble : MonoBehaviour
         }
     }
 
-    private void NotifyNeighbourRemove(Bubble bubble)
+    private void FallDown()
     {
-        if (neighbourBubbles.Contains(bubble))
-        {
-            neighbourBubbles.Remove(bubble);
-        }
+        gravity.SetGravityActive(true);
+        gravity.OnBorderHit += OnFallOutside;
+        BubbleManager.Instance.SetBubbleIdle(this);
+        RemoveNeighbour();
+    }
+
+    private void OnFallOutside()
+    {
+        gravity.OnBorderHit -= OnFallOutside;
+        UpdatePostion(new Vector3(630, 200, 0));
     }
 
 }

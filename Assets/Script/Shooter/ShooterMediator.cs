@@ -5,6 +5,7 @@ public class ShooterMediator
 {
     public Action<float> OnShootBubble;
     public Action OnReloadFinished;
+    public Action OnSwitchBullet;
 
     private ShooterView view;
     private float reloadTime;
@@ -38,6 +39,11 @@ public class ShooterMediator
         return view.pinSpot;
     }
 
+    public float GetAngle()
+    {
+        return Mathf.Deg2Rad * view.GetAimerRotation();
+    }
+
     private void UpdateProperty()
     {
         if (loadingPregress < 1)
@@ -54,13 +60,18 @@ public class ShooterMediator
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             if ((view.GetAimerRotation() + 360) % 360 < 160)
-                view.RotateAimer(rotataSpeed);
+                view.RotateAimer(rotataSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
             if ((view.GetAimerRotation() + 360) % 360 > 20)
-                view.RotateAimer(-rotataSpeed);
+                view.RotateAimer(-rotataSpeed * Time.deltaTime);
+        }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            OnSwitchBullet.Invoke();
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && loadingPregress >= 1 && BubbleGameManager.Instance.IsShootAllow())

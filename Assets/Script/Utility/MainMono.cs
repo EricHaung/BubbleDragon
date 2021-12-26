@@ -18,4 +18,9 @@ public class MainMono : MonoBehaviour
     {
         OnUpdate?.Invoke();
     }
+
+    public void Reset()
+    {
+        OnUpdate = null;
+    }
 }

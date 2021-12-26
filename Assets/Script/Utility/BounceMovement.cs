@@ -1,30 +1,28 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
-public class BounceMovement : MonoBehaviour
+public class BounceMovement
 {
-    public Vector4 border = new Vector4(0, 0, 0, 0); //left, up, right, down
+    private Vector4 border; //left, up, right, down
     private RectTransform moveItem;
     private Vector3 dir;
 
     private int hitBorderType = 0; // local parameter use in Update()
     private float overDis; // local parameter use in DistanceFix()
 
-    private void Start()
+    public BounceMovement(RectTransform _moveItem, Vector4 _border)
     {
-        if (moveItem == null)
-            moveItem = this.gameObject.GetComponent<RectTransform>();
-
+        border = _border;
+        moveItem = _moveItem;
         dir = Vector3.zero;
+        MainMono.Instance.OnUpdate += UpdatePosition;
     }
 
-    private void Update()
+    private void UpdatePosition()
     {
         if (dir == Vector3.zero)
             return;
 
-        moveItem.localPosition += dir;
+        moveItem.localPosition += dir * Time.deltaTime;
 
         hitBorderType = IsHitXBorder();
         if (hitBorderType != 0)

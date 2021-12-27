@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 
@@ -23,6 +22,17 @@ public class Gravity : MonoBehaviour
         border = _border;
         acceleration = _acceleration;
         speed = _speed;
+    }
+
+    public void SetGravityActive(bool _active)
+    {
+        active = _active;
+        if (active)
+            speed = acceleration * UnityEngine.Random.Range(0f, 0.5f);
+        else
+        {
+
+        }
     }
 
     private void Update()
@@ -52,16 +62,5 @@ public class Gravity : MonoBehaviour
             return 4;
         else
             return 0;
-    }
-
-    public void SetGravityActive(bool _active)
-    {
-        active = _active;
-        if (active)
-            speed = acceleration * UnityEngine.Random.Range(0f, 0.5f);
-        else
-        {
-
-        }
     }
 }

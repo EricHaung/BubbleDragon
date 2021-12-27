@@ -5,6 +5,7 @@ public class Piner
     public GameObject targetObj;
     public GameObject pinSpot;
     private bool isPin = false;
+    
     public Piner()
     {
         MainMono.Instance.OnUpdate += UpdatePin;
@@ -27,7 +28,7 @@ public class Piner
         isPin = active;
     }
 
-    void UpdatePin()
+    private void UpdatePin()
     {
         if (isPin)
         {

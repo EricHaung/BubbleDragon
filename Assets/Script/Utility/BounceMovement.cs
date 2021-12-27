@@ -17,6 +17,22 @@ public class BounceMovement
         MainMono.Instance.OnUpdate += UpdatePosition;
     }
 
+    public void SetDir(float speed, float angle)
+    {
+        dir.x = speed * Mathf.Cos(angle);
+        dir.y = speed * Mathf.Sin(angle);
+    }
+
+    public Vector3 GetDir()
+    {
+        return dir;
+    }
+
+    public void Reset()
+    {
+        dir = Vector3.zero;
+    }
+
     private void UpdatePosition()
     {
         if (dir == Vector3.zero)
@@ -37,22 +53,6 @@ public class BounceMovement
             DistanceFix(hitBorderType);
             dir.y *= -1;
         }
-    }
-
-    public void SetDir(float speed, float angle)
-    {
-        dir.x = speed * Mathf.Cos(angle);
-        dir.y = speed * Mathf.Sin(angle);
-    }
-
-    public Vector3 GetDir()
-    {
-        return dir;
-    }
-
-    public void Reset()
-    {
-        dir = Vector3.zero;
     }
 
     private int IsHitXBorder()

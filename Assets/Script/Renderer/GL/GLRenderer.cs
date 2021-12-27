@@ -29,7 +29,7 @@ namespace BubbleGL
                 Destroy(this);
         }
 
-        public void OnPostRender()
+        private void OnPostRender()
         {
             Draw();
         }
